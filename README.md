@@ -1,6 +1,6 @@
 # LHC_Hidroweb
 ---------------------
-## Library
+## Required Library
 - requests
 - zipfile
 - io
