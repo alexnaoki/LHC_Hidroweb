@@ -21,5 +21,23 @@ Follow the process in order to utilize the Interactive Tool.
   - Check again the environment to make sure the Environment was created `conda env list`.
   - Activate the environment `conda activate LHC_Hidroweb`.
 
+3. **Core packages** for the **Batch download**.
+  - Install `conda install requests`.
+  
+4. **Core packages** for the **interactive Map**.
+  - `conda install numpy`
+  - `conda install pandas`
+  - `conda install -c conda-forge geopandas`
+  - `conda install -c conda-forge ipywidgets`
+  - `conda install -c conda-forgenodejs`
+  - `conda install ipyleaflet`
+  
+5. **Add** the newly created Virtual Environment to **Jupyter**
+  - `pip install --user ipykernel`
+  - `python -m ipykernel install --user --name=LHC_Hidroweb`
+  
+6. **Install/Activate** the widgets for Jupyter-lab
+  - `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
+  - `jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet`
 
 
