@@ -39,4 +39,4 @@
   - `jupyter-lab`
   
 After opened the **Jupyter Lab**, you need to make sure to use the **correct kernel**.
-![](./imgs/fig01.png)
+![](./imgs/fig01.png?raw=true)
