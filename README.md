@@ -15,7 +15,11 @@ Follow the process in order to utilize the Interactive Tool.
 1. **First**, you need to open **Anaconda Prompt**.
 
 2. **Create** a new **Virtual Environment** for avoid possible conflict of packages.
-  - Deactivate the current environment by `conda deactivate`
+  - Deactivate the current environment by `conda deactivate`.
+  - Check the possible environment by `conda env list`.
+  - Create by `conda create --name LHC_Hidroweb python=3.7`.
+  - Check again the environment to make sure the Environment was created `conda env list`.
+  - Activate the environment `conda activate LHC_Hidroweb`.
 
 
 
