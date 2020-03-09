@@ -24,8 +24,8 @@
   - `conda install pandas`
   - `conda install -c conda-forge geopandas`
   - `conda install -c conda-forge ipywidgets`
-  - `conda install -c conda-forgenodejs`
-  - `conda install ipyleaflet`
+  - `conda install -c conda-forge nodejs`
+  - `conda install -c conda-forge ipyleaflet`
   
 5. **Add** the newly created Virtual Environment to **Jupyter**
   - `pip install --user ipykernel`
