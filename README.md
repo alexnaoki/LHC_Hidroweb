@@ -39,4 +39,4 @@
   - `jupyter-lab`
   
 After opened the **Jupyter Lab**, you need to make sure to use the **correct kernel**.
-
+![alt text](https://github.com/alexnaoki/LHC_Hidroweb/tree/master/imgs/fig01.png "Foto01")
