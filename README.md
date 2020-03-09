@@ -1,16 +1,11 @@
 # LHC_Hidroweb
 ---------------------
-## Required Library for <i>download_from_url_BATCH.py</i>
-- requests
-- zipfile
-- io
-- pathlib
-- os
 
 # Instalation GUIDE
-Follow the process in order to utilize the Interactive Tool.
+**Follow** the process in order to utilize the Interactive Tool.
 
-## It is **necessary** to use Anaconda for the following steps. The use of Anaconda facilitate the download and aplication of the following programs.
+#### It is **necessary** to use Anaconda for the following steps. The use of Anaconda facilitate the download and aplication of the following programs.
+
 -----------------------------------------
 1. **First**, you need to open **Anaconda Prompt**.
 
@@ -36,8 +31,12 @@ Follow the process in order to utilize the Interactive Tool.
   - `pip install --user ipykernel`
   - `python -m ipykernel install --user --name=LHC_Hidroweb`
   
-6. **Install/Activate** the widgets for Jupyter-lab
+6. **Install/Activate** the widgets for **Jupyter-lab**
   - `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
   - `jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet`
 
+7. **Opening Jupyter-lab**
+  - `jupyter-lab`
+  
+After opened the **Jupyter Lab**, you need to make sure to use the **correct kernel**.
 
