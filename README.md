@@ -10,12 +10,12 @@
 # Instalation GUIDE
 Follow the process in order to utilize the Interactive Tool.
 
-It is **necessary** to use Anaconda for the following steps. The use of Anaconda facilitate the download and aplication of the following programs.
+## It is **necessary** to use Anaconda for the following steps. The use of Anaconda facilitate the download and aplication of the following programs.
 -----------------------------------------
 1. **First**, you need to open **Anaconda Prompt**.
 
 2. **Create** a new **Virtual Environment** for avoid possible conflict of packages.
-  - Teste 
+  - Deactivate the current environment by `conda deactivate`
 
 
 
