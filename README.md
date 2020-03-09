@@ -40,3 +40,4 @@
   
 After opened the **Jupyter Lab**, you need to make sure to use the **correct kernel**.
 
+![alt text](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/imgs/fig01.PNG)
