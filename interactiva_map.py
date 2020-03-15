@@ -36,7 +36,8 @@ class ANA_interactive_map:
         self.feature_collection['features'].append(geo_json)
 
     def download_ANA_stations(self, list_codes, typeData, folder_toDownload):
-
+        numberOfcodes = len(list_codes)
+        count = 0
         path_folder = pathlib.Path(folder_toDownload)
         for station in list_codes:
             params = {'codEstacao': station, 'dataInicio': '', 'dataFim': '', 'tipoDados': '{}'.format(typeData), 'nivelConsistencia': ''}
@@ -89,16 +90,15 @@ class ANA_interactive_map:
                 df = pd.DataFrame({'Date': list_month_dates, 'Consistence': list_consistenciaF, 'Data': list_data})
                 filename = '{}_{}.csv'.format(typeData, station)
                 df.to_csv(path_folder / filename)
+                count += 1
+                self.control_loadingDownload.value = float(count+1)/numberOfcodes
             else:
-                pass
+                count += 1
+                self.control_loadingDownload.value = float(count+1)/numberOfcodes
+
+                # pass
 
     def download_buttom(self, *args):
-        # print('test')
-        # try:
-        #     # print('teste22')
-        # os.mkdir(r'C:\Users\Usuario\Desktop\lhc_hidroweb\test42')
-        # except:
-        #     print('asdasdads')
         try:
             # last_draw = self.feature_collection['features'][-1]['geometry']
             last_draw = self.control_draw.last_draw['geometry']
@@ -113,6 +113,7 @@ class ANA_interactive_map:
 
         if self.control_selectDownload.value == 'All':
             code_list = self.gdf.loc[self.gdf['geometry'].within(last_polygon), 'Codigo'].to_list()
+
             self.download_ANA_stations(list_codes=code_list, typeData=option, folder_toDownload=self.control_pathDownload.value)
 
         elif self.control_selectDownload.value == 'byDate':
@@ -153,13 +154,14 @@ class ANA_interactive_map:
         self.control_pathDownload = ipywidgets.Text(placeholder='Write your PATH to Download HERE.')
         vbox01 = ipywidgets.VBox([self.control_selectDownload, self.control_pathDownload])
         self.control_buttonDownload = ipywidgets.Button(description='Download')
+        self.control_loadingDownload = ipywidgets.FloatProgress(min=0, max=1, value=0)
 
         self.control_choiceDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'])
         hbox01 = ipywidgets.HBox([self.control_choiceDownload, self.control_buttonDownload])
-        vbox02 = ipywidgets.VBox([vbox01, hbox01])
+        vbox02 = ipywidgets.VBox([vbox01, hbox01, self.control_loadingDownload])
         widget_control03 = ipyleaflet.WidgetControl(widget=vbox02, position='bottomright')
         self.m01.add_control(widget_control03)
-        # control_progressDownload = ipywidgets.IntProgress()
+        # control_progressDownload = ipywidgets.FloatProgress()
 
     def layer(self):
         self.heatmap_all = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='All point Heatmap')
