@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 import calendar
 import numpy as np
 import pathlib
+import os
 
 
 class ANA_interactive_map:
@@ -21,10 +22,17 @@ class ANA_interactive_map:
 
         self.gdf = gpd.GeoDataFrame(self.df, geometry=gpd.points_from_xy(self.df.Longitude, self.df.Latitude), crs='epsg:4674')
 
-    def date_location(_):
-        self.heatmap_byLast.locations = [tuple(s) for s in self.df.loc[df['UltimaAtualizacao'] > self.date_slider.value, ['Latitude','Longitude']].to_numpy()]
+        self.m01 = ipyleaflet.Map(zoom=3)
+        self.layer()
+        self.controls_on_Map()
+        self.control_buttonDownload.on_click(self.download_buttom)
 
-    def handle_draw(self, action,geo_json):
+        display(self.m01)
+
+    def date_location(_):
+        self.heatmap_byLast.locations = [tuple(s) for s in self.df.loc[self.df['UltimaAtualizacao'] > self.date_slider.value, ['Latitude','Longitude']].to_numpy()]
+
+    def handle_draw(self, action, geo_json):
         self.feature_collection['features'].append(geo_json)
 
     def download_ANA_stations(self, list_codes, typeData, folder_toDownload):
@@ -62,7 +70,7 @@ class ANA_interactive_map:
                         except AttributeError:
                             data.append(None)
                             list_consistencia.append(int(consistencia))
-                    if params['tipoDados'] == '2'
+                    if params['tipoDados'] == '2':
                         value = 'Chuva{:02}'.format(day+1)
                         try:
                             data.append(float(i.find(value).text))
@@ -80,13 +88,20 @@ class ANA_interactive_map:
             if len(list_data) > 0:
                 df = pd.DataFrame({'Date': list_month_dates, 'Consistence': list_consistenciaF, 'Data': list_data})
                 filename = '{}_{}.csv'.format(typeData, station)
-                df.to_csv(path_folder/filename)
+                df.to_csv(path_folder / filename)
             else:
                 pass
 
-    def download_buttom(_):
+    def download_buttom(self, *args):
+        # print('test')
+        # try:
+        #     # print('teste22')
+        # os.mkdir(r'C:\Users\Usuario\Desktop\lhc_hidroweb\test42')
+        # except:
+        #     print('asdasdads')
         try:
-            last_draw = self.feature_collection['features'][-1]['geometry']
+            # last_draw = self.feature_collection['features'][-1]['geometry']
+            last_draw = self.control_draw.last_draw['geometry']
             last_polygon = Polygon([(i[0], i[1]) for i in last_draw['coordinates'][0]])
         except:
             pass
@@ -97,7 +112,7 @@ class ANA_interactive_map:
             option = 3
 
         if self.control_selectDownload.value == 'All':
-            code_list = self.gdf.loc[gdf['geometry'].within(last_polygon), 'Codigo'].to_list()
+            code_list = self.gdf.loc[self.gdf['geometry'].within(last_polygon), 'Codigo'].to_list()
             self.download_ANA_stations(list_codes=code_list, typeData=option, folder_toDownload=self.control_pathDownload.value)
 
         elif self.control_selectDownload.value == 'byDate':
@@ -105,9 +120,9 @@ class ANA_interactive_map:
             self.download_ANA_stations(list_codes=code_list, typeData=option, folder_toDownload=self.control_pathDownload.value)
 
         elif self.control_selectDownload.value == 'Watershed':
-            for i in shape['geometry']:
+            for i in self.shape['geometry']:
                 code_list = self.gdf.loc[self.gdf['geometry'].within(i), 'Codigo'].to_list()
-                self.download_ANA_stations(list_codes, typeData=a, folder_toDownload=self.control_pathDownload.value)
+                self.download_ANA_stations(list_codes=code_list, typeData=option, folder_toDownload=self.control_pathDownload.value)
 
 
     def controls_on_Map(self):
@@ -117,10 +132,8 @@ class ANA_interactive_map:
         control_fullscreen = ipyleaflet.FullScreenControl()
         self.m01.add_control(control_fullscreen)
 
-        control_draw = ipyleaflet.DrawControl()
-        self.feature_collection = {'type': 'FeatureCollection', 'features': []}
-        control_draw.on_draw(self.handle_draw)
-        self.m01.add_control(control_draw)
+        self.control_draw = ipyleaflet.DrawControl()
+        self.m01.add_control(self.control_draw)
 
         control_scale = ipyleaflet.ScaleControl(position='bottomleft')
         self.m01.add_control(control_scale)
@@ -136,13 +149,17 @@ class ANA_interactive_map:
         widget_control02 = ipyleaflet.WidgetControl(widget=self.date_slider, position='topright')
         self.m01.add_control(widget_control02)
 
-        control_selectDownload = ipywidgets.Dropdown(options=['Watershed', 'All', 'byDate'])
+        self.control_selectDownload = ipywidgets.Dropdown(options=['Watershed', 'All', 'byDate'])
         self.control_pathDownload = ipywidgets.Text(placeholder='Write your PATH to Download HERE.')
-        control_buttonDownload = ipywidgets.Button(description='Download')
-        control_choiceDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'])
-        # control_progressDownload = ipywidgets.IntProgress()
-        control_buttonDownload.on_click(self.download_buttom)
+        vbox01 = ipywidgets.VBox([self.control_selectDownload, self.control_pathDownload])
+        self.control_buttonDownload = ipywidgets.Button(description='Download')
 
+        self.control_choiceDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'])
+        hbox01 = ipywidgets.HBox([self.control_choiceDownload, self.control_buttonDownload])
+        vbox02 = ipywidgets.VBox([vbox01, hbox01])
+        widget_control03 = ipyleaflet.WidgetControl(widget=vbox02, position='bottomright')
+        self.m01.add_control(widget_control03)
+        # control_progressDownload = ipywidgets.IntProgress()
 
     def layer(self):
         self.heatmap_all = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='All point Heatmap')
@@ -150,11 +167,19 @@ class ANA_interactive_map:
 
         self.heatmap_byLast = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='By Date')
         self.m01.add_layer(self.heatmap_byLast)
+        # print('teste_layer')
 
-
-
-    def map(self):
-        self.m01 = ipyleaflet.Map(zoom=2)
-        self.layer()
-        self.controls_on_Map()
-        display(self.m01)
+        try:
+            path_shapefile = r'G:\Meu Drive\USP-SHS\Outros\Shapefile\Jaguaribe\Jaguaribe.shp'
+            self.shape = gpd.read_file(path_shapefile)
+            geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+                           hover_style={'fillColor': 'red' , 'fillOpacity': 0.2})
+            self.m01.add_layer(geo_data)
+        except:
+            pass
+    # def map(self):
+            # self.m01 = ipyleaflet.Map(zoom=3)
+            # self.layer()
+            # self.controls_on_Map()
+            #
+            # display(self.m01)
