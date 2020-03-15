@@ -29,7 +29,7 @@ class ANA_interactive_map:
 
         display(self.m01)
 
-    def date_location(_):
+    def date_location(self, *args):
         self.heatmap_byLast.locations = [tuple(s) for s in self.df.loc[self.df['UltimaAtualizacao'] > self.date_slider.value, ['Latitude','Longitude']].to_numpy()]
 
     def handle_draw(self, action, geo_json):
@@ -171,14 +171,14 @@ class ANA_interactive_map:
         self.m01.add_layer(self.heatmap_byLast)
         # print('teste_layer')
 
-        try:
-            path_shapefile = r'G:\Meu Drive\USP-SHS\Outros\Shapefile\Jaguaribe\Jaguaribe.shp'
-            self.shape = gpd.read_file(path_shapefile)
-            geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
-                           hover_style={'fillColor': 'red' , 'fillOpacity': 0.2})
-            self.m01.add_layer(geo_data)
-        except:
-            pass
+        # try:
+        #     path_shapefile = r'G:\Meu Drive\USP-SHS\Outros\Shapefile\Jaguaribe\Jaguaribe.shp'
+        #     self.shape = gpd.read_file(path_shapefile)
+        #     geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+        #                    hover_style={'fillColor': 'red' , 'fillOpacity': 0.2})
+        #     self.m01.add_layer(geo_data)
+        # except:
+        #     pass
     # def map(self):
             # self.m01 = ipyleaflet.Map(zoom=3)
             # self.layer()
