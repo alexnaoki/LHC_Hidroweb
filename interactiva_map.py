@@ -185,19 +185,26 @@ class ANA_interactive_map:
         self.control_selectDownload.observe(self.dropdown_shapefile, names='value')
         self.control_selectDownload.observe(self.shapefile_buttom, names='value')
 
+        box_layout = ipywidgets.Layout(display='flex', flex_flow='column', align_items='stretch', width='50%')
+
         self.control_pathDownload = ipywidgets.Text(placeholder='Write your PATH to Download HERE.')
         vbox01 = ipywidgets.VBox([self.control_selectDownload, self.control_pathDownload])
         self.control_buttonDownload = ipywidgets.Button(description='Download')
         self.control_loadingDownload = ipywidgets.FloatProgress(min=0, max=1, value=0)
 
         self.control_choiceDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'])
-        hbox01 = ipywidgets.HBox([self.control_choiceDownload, self.control_buttonDownload])
+        hbox01 = ipywidgets.HBox([self.control_choiceDownload, self.control_buttonDownload], layout=box_layout)
 
-        vbox02 = ipywidgets.VBox([vbox01, hbox01, self.control_loadingDownload])
+        vbox02 = ipywidgets.VBox([vbox01, hbox01, self.control_loadingDownload], layout=box_layout)
+
+
         widget_control03 = ipyleaflet.WidgetControl(widget=vbox02, position='bottomright')
         self.m01.add_control(widget_control03)
         # control_progressDownload = ipywidgets.FloatProgress()
         self.control_shapefileButtom = ipywidgets.Button(description='Visualizar')
+
+
+        self.control_teste01 = ipywidgets.Gr
 
     def layer(self):
         self.heatmap_all = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='All point Heatmap')
