@@ -22,18 +22,17 @@ class ANA_interactive_map:
 
         self.gdf = gpd.GeoDataFrame(self.df, geometry=gpd.points_from_xy(self.df.Longitude, self.df.Latitude), crs='epsg:4674')
 
-        self.m01 = ipyleaflet.Map(zoom=3)
+        self.m01 = ipyleaflet.Map(zoom=2, center=(-16, -47))
         self.layer()
         self.controls_on_Map()
         self.control_buttonDownload.on_click(self.download_buttom)
+        self.control_shapefileButtom.on_click(self.shapefile_buttom)
 
         display(self.m01)
 
     def date_location(self, *args):
         self.heatmap_byLast.locations = [tuple(s) for s in self.df.loc[self.df['UltimaAtualizacao'] > self.date_slider.value, ['Latitude','Longitude']].to_numpy()]
 
-    def handle_draw(self, action, geo_json):
-        self.feature_collection['features'].append(geo_json)
 
     def download_ANA_stations(self, list_codes, typeData, folder_toDownload):
         numberOfcodes = len(list_codes)
@@ -64,7 +63,7 @@ class ANA_interactive_map:
                         value = 'Vazao{:02}'.format(day+1)
                         try:
                             data.append(float(i.find(value).text))
-                            list_consitencia.append(int(consistencia))
+                            list_consistencia.append(int(consistencia))
                         except TypeError:
                             data.append(i.find(value).text)
                             list_consistencia.append(int(consistencia))
@@ -125,6 +124,38 @@ class ANA_interactive_map:
                 code_list = self.gdf.loc[self.gdf['geometry'].within(i), 'Codigo'].to_list()
                 self.download_ANA_stations(list_codes=code_list, typeData=option, folder_toDownload=self.control_pathDownload.value)
 
+    def dropdown_shapefile(self, *args):
+        if self.control_selectDownload.value == 'Watershed':
+            self.control_shapefileText = ipywidgets.Text(placeholder='Insert Shapefile PATH HERE')
+
+            hbox_shape = ipywidgets.HBox([self.control_shapefileText, self.control_shapefileButtom])
+            widget_control04 = ipyleaflet.WidgetControl(widget=hbox_shape, position='bottomright')
+            self.m01.add_control(widget_control04)
+
+        else:
+            try:
+                self.control_shapefileText.close()
+                self.control_shapefileButtom.close()
+                self.m01.remove_control(widget_control04)
+                self.m01.remove_layer(self.geo_data)
+            except:
+                pass
+
+    def shapefile_buttom(self, *args):
+        if self.control_selectDownload.value == 'Watershed':
+            try:
+                self.shape = gpd.read_file(self.control_shapefileText.value)
+                self.geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'red', 'fillColor': '#c51b8a', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+                               hover_style={'fillColor': 'red', 'fillOpacity': 0.2})
+                self.m01.add_layer(self.geo_data)
+            except:
+                pass
+        else:
+            try:
+                # self.m01.remove_layer(geo_data)
+                pass
+            except:
+                pass
 
     def controls_on_Map(self):
         control_layer = ipyleaflet.LayersControl(position='topright')
@@ -150,7 +181,10 @@ class ANA_interactive_map:
         widget_control02 = ipyleaflet.WidgetControl(widget=self.date_slider, position='topright')
         self.m01.add_control(widget_control02)
 
-        self.control_selectDownload = ipywidgets.Dropdown(options=['Watershed', 'All', 'byDate'])
+        self.control_selectDownload = ipywidgets.Dropdown(options=['Watershed', 'All', 'byDate'], value=None, description='Select type:')
+        self.control_selectDownload.observe(self.dropdown_shapefile, names='value')
+        self.control_selectDownload.observe(self.shapefile_buttom, names='value')
+
         self.control_pathDownload = ipywidgets.Text(placeholder='Write your PATH to Download HERE.')
         vbox01 = ipywidgets.VBox([self.control_selectDownload, self.control_pathDownload])
         self.control_buttonDownload = ipywidgets.Button(description='Download')
@@ -158,10 +192,12 @@ class ANA_interactive_map:
 
         self.control_choiceDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'])
         hbox01 = ipywidgets.HBox([self.control_choiceDownload, self.control_buttonDownload])
+
         vbox02 = ipywidgets.VBox([vbox01, hbox01, self.control_loadingDownload])
         widget_control03 = ipyleaflet.WidgetControl(widget=vbox02, position='bottomright')
         self.m01.add_control(widget_control03)
         # control_progressDownload = ipywidgets.FloatProgress()
+        self.control_shapefileButtom = ipywidgets.Button(description='Visualizar')
 
     def layer(self):
         self.heatmap_all = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='All point Heatmap')
@@ -170,22 +206,16 @@ class ANA_interactive_map:
         self.heatmap_byLast = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='By Date')
         self.m01.add_layer(self.heatmap_byLast)
 
-        try:
-            path_shapefile = r'G:\Meu Drive\USP-SHS\Outros\Shapefile\Jaguaribe\Jaguaribe.shp'
-            self.shape = gpd.read_file(path_shapefile)
-            geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
-                           hover_style={'fillColor': 'red' , 'fillOpacity': 0.2})
-            self.m01.add_layer(geo_data)
-        except:
-            pass
+        # try:
+        #     # path_shapefile = r'G:\Meu Drive\USP-SHS\Outros\Shapefile\Jaguaribe\Jaguaribe.shp'
+        #     self.shape = gpd.read_file(self.control_shapefileText.value)
+        #     geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+        #                    hover_style={'fillColor': 'red' , 'fillOpacity': 0.2})
+        #     self.m01.add_layer(geo_data)
+        # except:
+        #     pass
 
-        marks = tuple([ipyleaflet.Marker(location=(lat, lon)) for lat, lon in self.df[['Latitude', 'Longitude']].to_numpy()])
-        marker_cluster = ipyleaflet.MarkerCluster(markers=marks)
-        self.m01.add_layer(marker_cluster)
-
-    # def map(self):
-            # self.m01 = ipyleaflet.Map(zoom=3)
-            # self.layer()
-            # self.controls_on_Map()
-            #
-            # display(self.m01)
+        # Layer too slow to used
+        # marks = tuple([ipyleaflet.Marker(location=(lat, lon)) for lat, lon in self.df[['Latitude', 'Longitude']].to_numpy()])
+        # marker_cluster = ipyleaflet.MarkerCluster(markers=marks)
+        # self.m01.add_layer(marker_cluster)
