@@ -169,16 +169,20 @@ class ANA_interactive_map:
 
         self.heatmap_byLast = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='By Date')
         self.m01.add_layer(self.heatmap_byLast)
-        # print('teste_layer')
 
-        # try:
-        #     path_shapefile = r'G:\Meu Drive\USP-SHS\Outros\Shapefile\Jaguaribe\Jaguaribe.shp'
-        #     self.shape = gpd.read_file(path_shapefile)
-        #     geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
-        #                    hover_style={'fillColor': 'red' , 'fillOpacity': 0.2})
-        #     self.m01.add_layer(geo_data)
-        # except:
-        #     pass
+        try:
+            path_shapefile = r'G:\Meu Drive\USP-SHS\Outros\Shapefile\Jaguaribe\Jaguaribe.shp'
+            self.shape = gpd.read_file(path_shapefile)
+            geo_data = ipyleaflet.GeoData(geo_dataframe=self.shape, name='Bacias',style={'color': 'black', 'fillColor': '#3366cc', 'opacity':0.05, 'weight':1.9, 'dashArray':'2', 'fillOpacity':0.6},
+                           hover_style={'fillColor': 'red' , 'fillOpacity': 0.2})
+            self.m01.add_layer(geo_data)
+        except:
+            pass
+
+        marks = tuple([ipyleaflet.Marker(location=(lat, lon)) for lat, lon in self.df[['Latitude', 'Longitude']].to_numpy()])
+        marker_cluster = ipyleaflet.MarkerCluster(markers=marks)
+        self.m01.add_layer(marker_cluster)
+
     # def map(self):
             # self.m01 = ipyleaflet.Map(zoom=3)
             # self.layer()
