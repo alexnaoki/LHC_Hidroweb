@@ -185,7 +185,7 @@ class ANA_interactive_map:
         self.control_selectDownload.observe(self.dropdown_shapefile, names='value')
         self.control_selectDownload.observe(self.shapefile_buttom, names='value')
 
-        box_layout = ipywidgets.Layout(display='flex', flex_flow='column', align_items='stretch', width='50%')
+        box_layout = ipywidgets.Layout(display='flex', flex_flow='column', align_items='stretch', width='100%')
 
         self.control_pathDownload = ipywidgets.Text(placeholder='Write your PATH to Download HERE.')
         vbox01 = ipywidgets.VBox([self.control_selectDownload, self.control_pathDownload])
@@ -204,7 +204,7 @@ class ANA_interactive_map:
         self.control_shapefileButtom = ipywidgets.Button(description='Visualizar')
 
 
-        self.control_teste01 = ipywidgets.Gr
+        # self.control_teste01 = ipywidgets.Gr
 
     def layer(self):
         self.heatmap_all = ipyleaflet.Heatmap(locations=[tuple(r) for r in self.df[['Latitude', 'Longitude']].to_numpy()],radius=30, name='All point Heatmap')
@@ -223,6 +223,6 @@ class ANA_interactive_map:
         #     pass
 
         # Layer too slow to used
-        # marks = tuple([ipyleaflet.Marker(location=(lat, lon)) for lat, lon in self.df[['Latitude', 'Longitude']].to_numpy()])
-        # marker_cluster = ipyleaflet.MarkerCluster(markers=marks)
-        # self.m01.add_layer(marker_cluster)
+        marks = tuple([ipyleaflet.Marker(location=(lat, lon)) for lat, lon in self.df[['Latitude', 'Longitude']].to_numpy()])
+        marker_cluster = ipyleaflet.MarkerCluster(markers=marks)
+        self.m01.add_layer(marker_cluster)

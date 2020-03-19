@@ -1,0 +1,7 @@
+ipyleaflet==0.12.3
+ipywidgets==7.5.1
+pandas==1.0.1
+geopandas==0.7.0
+shapely==1.7.0
+requests==2.23.0
+numpy==1.18.1
