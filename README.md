@@ -19,7 +19,7 @@
 3. **Core packages** for the **Batch download**.
   - Install `conda install requests`.
   
-4. **Core packages** for the **interactive Map**.
+4. **Core packages** for the **Interactive Map**.
   - `conda install numpy`
   - `conda install pandas`
   - `conda install -c conda-forge geopandas`
@@ -45,3 +45,7 @@ After opened the **Jupyter Lab**, you need to make sure to use the **correct ker
 And, if the selected kernel is other than the one just created, selected the **correct kernel**.
 
 ![alt text](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/imgs/fig02.PNG)
+
+8. **Open** the **View_Map01.ipynb** in Jupyter-lab and **Run the cells**
+
+9. **Enjoy the interactive map!**
