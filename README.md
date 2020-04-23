@@ -40,11 +40,11 @@
   
   - After opened the **Jupyter Lab**, you need to make sure to use the **correct kernel**.
 
-  - ![alt text](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/imgs/fig03.jpg)
+![alt text](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/imgs/fig03.jpg)
 
   - And, if the selected kernel is other than the one just created, selected the **correct kernel**.
 
-  - ![alt text](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/imgs/fig02.PNG)
+![alt text](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/imgs/fig02.PNG)
 
 8. **Open** the **View_Map01.ipynb** in Jupyter-lab and **Run the cells**
 
