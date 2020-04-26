@@ -1,6 +1,9 @@
 # LHC_Hidroweb
 ---------------------
 
+![](https://github.com/alexnaoki/LHC_Hidroweb/tree/master/gifs/inventario02.gif)
+
+
 # Instalation GUIDE
 **Follow** the process in order to utilize the Interactive Tool.
 
