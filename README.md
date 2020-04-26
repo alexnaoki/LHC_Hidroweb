@@ -1,7 +1,22 @@
 # LHC_Hidroweb
 ---------------------
+# Introduction
+---------------------
+LHC_Hidroweb is a Jupyter application for visualize ANA's Inventory and download Rainfall or Flow data from ANA's API.
 
+# Usage
+---------------------
+You can use a ".csv" file from ANA's website, or you can get the latest Inventory file from ANA's API (and later save in your local).
 ![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/inventario01.gif)
+
+After uploading the Inventory data you can **visualize** the columns in the inventory.
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/viewtable01.gif)
+
+And, check a few basic **stats**.
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/stats01.gif)
+
+And finally you can easily **download** the **Rainfall** or **Flow**data with a **self drawn contour** or use a **Shapefile**.
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/download01.gif)
 
 
 # Instalation GUIDE
