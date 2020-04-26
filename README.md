@@ -1,7 +1,7 @@
 # LHC_Hidroweb
 ---------------------
 
-![](https://github.com/alexnaoki/LHC_Hidroweb/tree/master/gifs/inventario01.gif)
+![alt text](https://github.com/alexnaoki/LHC_Hidroweb/tree/master/gifs/inventario01.gif)
 
 
 # Instalation GUIDE
