@@ -15,7 +15,7 @@ After uploading the Inventory data you can **visualize** the columns in the inve
 And, check a few basic **stats**.
 ![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/stats01.gif)
 
-And finally you can easily **download** the **Rainfall** or **Flow**data with a **self drawn contour** or use a **Shapefile**.
+And finally you can easily **download** the **Rainfall** or **Flow** data with a **self drawn contour** or use a **Shapefile**.
 ![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/download01.gif)
 
 --------------------------------------
