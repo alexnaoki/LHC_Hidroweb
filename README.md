@@ -34,6 +34,7 @@ And finally you can easily **download** the **Rainfall** or **Flow** data with a
   - Check again the environment to make sure the Environment was created `conda env list`.
   - Activate the environment `conda activate LHC_Hidroweb`.
 
+
 3. **Core packages** for the **Batch download**.
   - Install `conda install requests`.
   
@@ -44,6 +45,8 @@ And finally you can easily **download** the **Rainfall** or **Flow** data with a
   - `conda install -c conda-forge ipywidgets`
   - `conda install -c conda-forge nodejs`
   - `conda install -c conda-forge ipyleaflet`
+  - `conda install -c conda-forge jupyter-lab`
+  - `conda install -c conda-forge spyder`
   
 5. **Add** the newly created Virtual Environment to **Jupyter**
   - `pip install --user ipykernel`
