@@ -45,7 +45,7 @@ And finally you can easily **download** the **Rainfall** or **Flow** data with a
   - `conda install -c conda-forge ipywidgets`
   - `conda install -c conda-forge nodejs`
   - `conda install -c conda-forge ipyleaflet`
-  - `conda install -c conda-forge jupyter-lab`
+  - `conda install -c conda-forge jupyterlab`
   - `conda install -c conda-forge spyder`
   
 5. **Add** the newly created Virtual Environment to **Jupyter**
