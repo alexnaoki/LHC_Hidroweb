@@ -7,16 +7,19 @@ LHC_Hidroweb is a Jupyter application for visualize ANA's Inventory and download
 # Usage
 
 You can use a ".csv" file from ANA's website, or you can get the latest Inventory file from ANA's API (and later save in your local).
-![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/inventario01.gif)
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/inventario01_v2.gif)
 
 After uploading the Inventory data you can **visualize** the columns in the inventory.
-![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/viewtable01.gif)
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/tables01_v2.gif)
 
 And, check a few basic **stats**.
-![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/stats01.gif)
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/stats01_v2.gif)
 
 And finally you can easily **download** the **Rainfall** or **Flow** data with a **self drawn contour** or use a **Shapefile**.
-![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/download01.gif)
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/download01_v2.gif)
+
+A quick graph visualization can be done by checking the date period with some data in the Downloaded data.
+![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/graphs01_v2.gif)
 
 --------------------------------------
 
