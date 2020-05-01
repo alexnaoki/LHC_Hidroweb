@@ -11,22 +11,27 @@ import numpy as np
 import pathlib
 import os
 
+import bqplot as bq
+from functools import reduce
+
 class ANA_interactive_map:
 
 
     def __init__(self):
 
-        self.m01 = ipyleaflet.Map(zoom=3, center=(-16, -47), layout=ipywidgets.Layout(width='70%'))
+        self.m01 = ipyleaflet.Map(zoom=6, center=(-16, -47), layout=ipywidgets.Layout(width='60%', height='500px'))
 
         self.controls_on_Map()
 
         self.out01 = ipywidgets.Output()
 
-        self.tabs = ipywidgets.Tab([self.tab00(), self.tab01(), self.tab02(), self.tab03()], layout=ipywidgets.Layout(width='30%'))
-        self.tabs.set_title(0, 'Inventario')
-        self.tabs.set_title(1, 'Download')
-        self.tabs.set_title(2, 'View Tables')
-        self.tabs.set_title(3, 'Stats')
+        self.tabs = ipywidgets.Tab([self.tab00(), self.tab01(), self.tab02(),self.tab03(),  self.tab04()], layout=ipywidgets.Layout(width='40%'))
+        self.tabs.set_title(0, 'Inventory ')
+        self.tabs.set_title(1, 'Tables')
+        self.tabs.set_title(2, 'Stats')
+        self.tabs.set_title(3, 'Download')
+        self.tabs.set_title(4, 'Graphs')
+
 
 
         display(ipywidgets.VBox([ipywidgets.HBox([self.m01, self.tabs]),
@@ -61,7 +66,7 @@ class ANA_interactive_map:
 
     def tab00(self):
         with self.out01:
-            # print('asdfasfsd')
+            self.html_00_01 = ipywidgets.HTML(value="<h2>Inventory</h2><hr><p>In order to utilize the program, you need to insert a <b>Inventory File</b> or get it from the <b>ANA's API</b>.</p>")
             self.radioButton_typeInvetario = ipywidgets.RadioButtons(options=['Select Path', 'Get from API'], value=None)
             self.radioButton_typeInvetario.observe(self._radioButton_inventario, names='value')
 
@@ -78,12 +83,20 @@ class ANA_interactive_map:
             self.floatProgress_loadingInventario.bar_style = 'info'
 
 
-            self.checkbox_intSliderRadius = ipywidgets.Checkbox(value=False, description='Radius Slider')
-            self.checkbox_intSliderRadius.observe(self._checkbox_radius, 'value')
 
-            self.checkbox_selectionDate = ipywidgets.Checkbox(value=False, description='Date Slider')
-            self.checkbox_selectionDate.observe(self._checkbox_date, 'value')
+            self.intSlider_01 = ipywidgets.IntSlider(description='Radius', min=1, max=50, value=15)
+            self.intSlider_01.observe(self._intSlider_radius, 'value')
+            widget_control01 = ipyleaflet.WidgetControl(widget=self.intSlider_01, position='bottomright')
+            self.m01.add_control(widget_control01)
 
+
+            self.selectionSlider_date01 = ipywidgets.SelectionSlider(options=pd.date_range(start='2000-01-01',end='2020-01-01', freq='M').to_numpy())
+            self.selectionSlider_date01.observe(self._selection_observe_01, names='value')
+            widget_control02 = ipyleaflet.WidgetControl(widget=self.selectionSlider_date01, position='bottomright')
+            self.m01.add_control(widget_control02)
+
+
+            self.html_00_02 = ipywidgets.HTML(value="<hr><p>Save the <b>API's</b> Inventory file:</p>")
             self.text_pathSaveInventario = ipywidgets.Text(placeholder='Insert path to Save Inventario')
             self.button_pathSaveInventario = ipywidgets.Button(description='Save')
             self.button_pathSaveInventario.on_click(self._button_saveInventario)
@@ -93,15 +106,19 @@ class ANA_interactive_map:
             self.text_pathSaveInventario.disabled = True
             self.button_pathSaveInventario.disabled = True
 
-        return ipywidgets.VBox([self.radioButton_typeInvetario,
+            self.intSlider_01.disabled = True
+            self.selectionSlider_date01.disabled = True
+
+        return ipywidgets.VBox([self.html_00_01,
+                                self.radioButton_typeInvetario,
                                 ipywidgets.HBox([self.text_pathInvetario,self.button_pathInventario]),
                                 self.button_showInventario,
                                 self.floatProgress_loadingInventario,
-                                self.checkbox_intSliderRadius,
-                                self.checkbox_selectionDate,
+                                self.html_00_02,
                                 ipywidgets.HBox([self.text_pathSaveInventario, self.button_pathSaveInventario])])
 
-    def tab01(self):
+    def tab03(self):
+        self.html_03_01 = ipywidgets.HTML(value="<h2>Download</h2><hr><p>In order to <b>Download</b>, you need the <b>Inventory</b>.<p> Then, you can choose between using the <b>Watershed's Shapefile</b> or <b>Draw a Contour</b>.</p><p> Finally, you'll can choose to download <b>Rain</b> or <b>Flow</b> data.</p> <p>(*)You also, if selected <b>byDate</b> can filter the data.</p>")
         self.dropdown_typeDownload = ipywidgets.Dropdown(options=['Watershed', 'All', 'byDate'], value=None, description='Select type:', layout=ipywidgets.Layout(width='90%'))
         self.dropdown_typeDownload.observe(self._dropdown_observe_01, names='value')
         self.dropdown_typeDownload.observe(self._shapefile_buttom, names='value')
@@ -122,17 +139,21 @@ class ANA_interactive_map:
         self.radioButton_typeDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'], layout=ipywidgets.Layout(width='30%'))
 
 
-        return ipywidgets.VBox([ipywidgets.VBox([self.dropdown_typeDownload,
+        return ipywidgets.VBox([ipywidgets.VBox([self.html_03_01,
+                                                 self.dropdown_typeDownload,
                                                  self.radioButton_typeDownload,
                                                  ipywidgets.HBox([self.text_pathShapefle,self.button_ViewShapefile])]),
                                 ipywidgets.HBox([self.text_pathDownload, self.button_download]),
                                 self.floatProgress_loadingDownload])
 
-    def tab02(self):
+    def tab01(self):
         self.out02 = ipywidgets.Output()
 
         with self.out02:
+            self.html_01_01 = ipywidgets.HTML(value="<h2>Inventory</h2><hr><p>This tab is for the visualization of the <b>Inventory's</b> data table.</p>")
+
             self.dropdown_typeView = ipywidgets.Dropdown(options=['Watershed', 'All', 'byDate'], value=None, description='Select type:', layout=ipywidgets.Layout(width='90%'))
+            self.dropdown_typeView.observe(self._dropdown_oberve_01_02, 'value')
             self.dropdown_typeView.observe(self._selectionMultiple_column, 'value')
             self.dropdown_typeView.observe(self._dropdown_observe_02, 'value')
 
@@ -144,37 +165,82 @@ class ANA_interactive_map:
             self.selectionMultiple_df_01 = ipywidgets.SelectMultiple(description='Columns:')
             self.selectionMultiple_df_01.observe(self._selectionMultiple_column, 'value')
 
-            self.selectionSlider_date02 = ipywidgets.SelectionSlider(options=pd.date_range(start='2000-01-01',end='2020-01-01', freq='M').to_numpy())
+            self.selectionSlider_date02 = ipywidgets.SelectionSlider(options=pd.date_range(start='2000-01-01',end='2020-01-01', freq='M').to_numpy(),layout=ipywidgets.Layout(width='90%'))
             self.selectionSlider_date02.observe(self._selection_observe_02, 'value')
 
+            self.html_01_02 = ipywidgets.HTML(value="<hr><p>Save the <b>Table</b> below:</p>")
             self.text_pathSaveInventarioDF = ipywidgets.Text(placeholder='Insert Path to Save')
             self.button_pathSaveInventarioDF = ipywidgets.Button(description='Save')
             self.button_pathSaveInventarioDF.on_click(self._button_saveInventarioDF)
 
-        return ipywidgets.VBox([self.dropdown_typeView,
+            self.text_pathShapefile_02.disabled = True
+            self.button_ViewShapefile_02.disabled = True
+            self.text_pathSaveInventarioDF.disabled = True
+            self.button_pathSaveInventarioDF.disabled = True
+
+        return ipywidgets.VBox([self.html_01_01,
+                                self.dropdown_typeView,
                                 ipywidgets.HBox([self.text_pathShapefile_02, self.button_ViewShapefile_02]),
                                 self.selectionMultiple_df_01,
                                 self.selectionSlider_date02,
+                                self.html_01_02,
                                 ipywidgets.HBox([self.text_pathSaveInventarioDF, self.button_pathSaveInventarioDF]),
                                 self.out02])
 
-    def tab03(self):
+    def tab02(self):
         self.out03 = ipywidgets.Output()
         self.out03_02 = ipywidgets.Output()
-            # self.dropdown_typeView = ipywidgets.Dropdown(options=['Watershed', 'All', 'byDate'], value=None, description='Select type:', layout=ipywidgets.Layout(width='90%'))
+        self.html_02_01 = ipywidgets.HTML(value="<h2>Inventory</h2><hr><p>This tab is for the visualization of the <b>Inventory's</b> basic stats.</p>")
+        self.html_02_02 = ipywidgets.HTML()
 
-
-        # with self.out03:
-            # display(self.subset01['Codigo'].count())
 
         self.accordion01 = ipywidgets.Accordion([self.out03_02])
         self.accordion01.set_title(0, 'More stats')
 
-        return ipywidgets.VBox([self.dropdown_typeView,
+        return ipywidgets.VBox([self.html_02_01,
+                                self.dropdown_typeView,
                                 ipywidgets.HBox([self.text_pathShapefile_02, self.button_ViewShapefile_02]),
                                 self.selectionSlider_date02,
+                                self.html_02_02,
                                 self.out03,
                                 self.accordion01])
+
+    def tab04(self):
+        self.html_teste = ipywidgets.HTML(value="<h2>Download</h2><hr><p>In this tab, <b>after completed the Download</b> you can visualize the Date Periods of your data. But first, you'll need to select <b>2 or more columns</b>.</p><p><b>Red</b> means no data in the month.</p><p><b>Blue</b> means at least one day with data in the month.</p>")
+        self.out04 = ipywidgets.Output()
+        with self.out04:
+            # self.x_scale_01 = bq.DateScale()
+            # self.y_scale_01 = bq.LinearScale()
+            self.x_scale_hm_01 = bq.OrdinalScale()
+            self.y_scale_hm_01 = bq.OrdinalScale()
+            self.c_scale_hm_01 = bq.ColorScale(scheme='RdYlBu')
+
+            self.x_axis_01 = bq.Axis(scale=self.x_scale_hm_01,tick_rotate=270,tick_style={'font-size': 12}, num_ticks=5)
+            self.y_axis_01 = bq.Axis(scale=self.y_scale_hm_01, orientation='vertical',tick_style={'font-size': 10})
+            self.c_axis_01 = bq.ColorAxis(scale=self.c_scale_hm_01)
+
+            self.fig_01 = bq.Figure(axes=[self.x_axis_01, self.y_axis_01],fig_margin={'top':40,'bottom':40,'left':40,'right':40})
+
+            # self.dropdown_xAxis_01 = ipywidgets.Dropdown(description='X-Axis')
+            # self.dropdown_yAxis_01 = ipywidgets.Dropdown(description='Y-Axis')
+            # self.dropdown_xAxis_01.observe(self._dropdown_observe_axis, 'value')
+            # self.dropdown_yAxis_01.observe(self._dropdown_observe_axis, 'value')
+
+            self.selectionMultiple_column = ipywidgets.SelectMultiple(description='Columns')
+            self.selectionMultiple_column.observe(self._selectionMultiple_observe_column, 'value')
+
+
+            self.button_datePeriod = ipywidgets.Button(description='Plot')
+            self.button_datePeriod.on_click(self._button_datePeriod)
+
+        return ipywidgets.VBox([self.html_teste,
+                                self.selectionMultiple_column,
+                                self.button_datePeriod,
+                                self.fig_01,
+                                self.out04])
+
+
+
 
     def _api_inventario(self):
         api_inventario = 'http://telemetriaws1.ana.gov.br/ServiceANA.asmx/HidroInventario'
@@ -220,6 +286,7 @@ class ANA_interactive_map:
         count = 0
         path_folder = pathlib.Path(folder_toDownload)
         self.floatProgress_loadingDownload.bar_style = 'info'
+        self.dfs_download = []
 
         for station in list_codes:
             params = {'codEstacao': station, 'dataInicio': '', 'dataFim': '', 'tipoDados': '{}'.format(typeData), 'nivelConsistencia': ''}
@@ -269,14 +336,25 @@ class ANA_interactive_map:
                 list_month_dates = list_month_dates + month_dates
 
             if len(list_data) > 0:
-                df = pd.DataFrame({'Date': list_month_dates, 'Consistence': list_consistenciaF, 'Data': list_data})
+                df = pd.DataFrame({'Date': list_month_dates, 'Consistence_{}_{}'.format(typeData,station): list_consistenciaF, 'Data{}_{}'.format(typeData,station): list_data})
                 filename = '{}_{}.csv'.format(typeData, station)
                 df.to_csv(path_folder / filename)
                 count += 1
                 self.floatProgress_loadingDownload.value = float(count+1)/numberOfcodes
+                self.dfs_download.append(df)
             else:
                 count += 1
                 self.floatProgress_loadingDownload.value = float(count+1)/numberOfcodes
+
+        try:
+            # self.dfs_merge_teste = pd.merge(self.dfs_download[0], self.dfs_download[1], on=['Date'], how='outer')
+            self.dfs_merge_teste0 = reduce(lambda left,right: pd.merge(left, right, on=['Date'], how='outer'), self.dfs_download)
+            # self.dropdown_xAxis_01.options = self.dfs_merge_teste.columns.to_list()
+            # self.dropdown_yAxis_01.options = self.dropdown_xAxis_01.options
+            self.dfs_merge_teste0.to_csv(path_folder/'Todos_dados_{}.csv'.format(typeData))
+            self.selectionMultiple_column.options = list(filter(lambda i: 'Data' in i, self.dfs_merge_teste0.columns.to_list()))
+        except:
+            pass
 
         self.floatProgress_loadingDownload.bar_style = 'success'
                 # pass
@@ -302,6 +380,8 @@ class ANA_interactive_map:
 
     def _button_showInventario(self, *args):
         with self.out01:
+            self.floatProgress_loadingInventario.bar_style = 'info'
+
             if self.radioButton_typeInvetario.value == 'Select Path':
                 self.floatProgress_loadingInventario.value = 0
                 try:
@@ -345,47 +425,12 @@ class ANA_interactive_map:
 
                 self.floatProgress_loadingInventario.bar_style = 'success'
 
-    def _checkbox_radius(self, *args):
-        with self.out01:
-            try:
-                if self.checkbox_intSliderRadius.value == True:
-                    self.intSlider_01 = ipywidgets.IntSlider(description='Radius', min=1, max=50, value=15)
-                    self.intSlider_01.observe(self._intSlider_radius, 'value')
-                    widget_control01 = ipyleaflet.WidgetControl(widget=self.intSlider_01, position='bottomright')
-                    self.m01.add_control(widget_control01)
-
-                else:
-                    try:
-                        self.intSlider_01.close()
-                        self.m01.remove_control(widget_control01)
-                    except:
-                        pass
-            except:
-                pass
+            self.intSlider_01.disabled = False
+            self.selectionSlider_date01.disabled = False
 
     def _intSlider_radius(self, *args):
-        # ipywidgets.jslink((intSlider_01, 'value'),(self.heatmap_all,'radius'))
-        # ipywidgets.jslink((intSlider_01, 'value'), (self.heatmap_byLast,'radius'))
         self.heatmap_all.radius = self.intSlider_01.value
         self.heatmap_byLast.radius = self.intSlider_01.value
-
-    def _checkbox_date(self, *args):
-        with self.out01:
-            try:
-                if self.checkbox_selectionDate.value == True:
-                    self.selectionSlider_date01 = ipywidgets.SelectionSlider(options=pd.date_range(start='2000-01-01',end='2020-01-01', freq='M').to_numpy())
-                    self.selectionSlider_date01.observe(self._selection_observe_01, names='value')
-                    widget_control02 = ipyleaflet.WidgetControl(widget=self.selectionSlider_date01, position='bottomright')
-                    self.m01.add_control(widget_control02)
-
-                else:
-                    try:
-                        self.selectionSlider_date01.close()
-                        self.m01.remove_control(widget_control02)
-                    except:
-                        pass
-            except:
-                pass
 
     def _selection_observe_01(self, *args):
         self.heatmap_byLast.locations = [tuple(s) for s in self.df.loc[self.df['UltimaAtualizacao'] > self.selectionSlider_date01.value, ['Latitude','Longitude']].to_numpy()]
@@ -432,12 +477,9 @@ class ANA_interactive_map:
 
     def _download_button01(self, *args):
         try:
-            # with self.out01:
-            # last_draw = self.feature_collection['features'][-1]['geometry']
+
             last_draw = self.draw_control.last_draw['geometry']
-            # print(last_draw)
             last_polygon = Polygon([(i[0], i[1]) for i in last_draw['coordinates'][0]])
-            # print(last_polygon)
         except:
             pass
 
@@ -502,20 +544,6 @@ class ANA_interactive_map:
                     for i in self.shape_02['geometry']:
                         self.subset01 = self.gdf.loc[self.gdf['geometry'].within(i), list(self.selectionMultiple_df_01.value)]
 
-                        # self.df_stat = self.gdf.loc[self.gdf['geometry'].within(i)]
-                        #
-                        # self.out03.clear_output()
-                        # with self.out03:
-                        #     print('Count:')
-                        #     display(self.df_stat['Codigo'].count())
-                        #     print('Operating:')
-                        #     display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
-                        #     print('Last update:')
-                        #     display(self.df_stat['UltimaAtualizacao'].max())
-                        #     print('Drainage Area (mean):')
-                        #     display(self.df_stat['AreaDrenagem'].mean())
-                        #     print('Altitude (mean):')
-                        #     display(self.df_stat['Altitude'].mean())
 
                 display(self.subset01)
 
@@ -545,16 +573,17 @@ class ANA_interactive_map:
 
                 self.out03.clear_output()
                 with self.out03:
-                    print('Count:')
-                    display(self.df_stat['Codigo'].count())
-                    print('Operating:')
-                    display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
-                    print('Last update:')
-                    display(self.df_stat['UltimaAtualizacao'].max())
-                    print('Drainage Area (mean):')
-                    display(self.df_stat['AreaDrenagem'].mean())
-                    print('Altitude (mean):')
-                    display(self.df_stat['Altitude'].mean())
+                    self.html_02_02.value = "<table> <tr><td><span style='font-weight:bold'>Count:</spam></td> <td>{}</td></tr><tr><td><span style='font-weight:bold'>Operating:</span></td> <td>{}</td></tr> <tr> <td><span style='font-weight:bold'>Last Update:</span></td><td>{}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Drainage Area:</span></td>    <td>{:.2f}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Altitude:</span></td>    <td>{:.2f}</td>  </tr></table>".format(self.df_stat['Codigo'].count(),self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count(),self.df_stat['UltimaAtualizacao'].max(),self.df_stat['AreaDrenagem'].mean(),self.df_stat['Altitude'].mean())
+                    # print('Count:')
+                    # display(self.df_stat['Codigo'].count())
+                    # print('Operating:')
+                    # display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
+                    # print('Last update:')
+                    # display(self.df_stat['UltimaAtualizacao'].max())
+                    # print('Drainage Area (mean):')
+                    # display(self.df_stat['AreaDrenagem'].mean())
+                    # print('Altitude (mean):')
+                    # display(self.df_stat['Altitude'].mean())
             else:
                 pass
         except:
@@ -583,7 +612,16 @@ class ANA_interactive_map:
             self.subset01 = self.gdf.loc[self.gdf['geometry'].within(last_polygon),list(self.selectionMultiple_df_01.value)]
             display(self.subset01)
 
-
+    def _dropdown_oberve_01_02(self, *args):
+        with self.out03:
+            if self.dropdown_typeView.value == 'Watershed':
+                self.text_pathShapefile_02.disabled = False
+                self.button_ViewShapefile_02.disabled = False
+            else:
+                self.text_pathShapefile_02.disabled = True
+                self.button_ViewShapefile_02.disabled = True
+            self.text_pathSaveInventarioDF.disabled = False
+            self.button_pathSaveInventarioDF.disabled = False
 
 
     def _output_stats(self, *args):
@@ -603,17 +641,7 @@ class ANA_interactive_map:
 
             elif self.dropdown_typeView.value == 'Watershed':
                 pass
-
-            print('Count:')
-            display(self.df_stat['Codigo'].count())
-            print('Operating:')
-            display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
-            print('Last update:')
-            display(self.df_stat['UltimaAtualizacao'].max())
-            print('Drainage Area (mean):')
-            display(self.df_stat['AreaDrenagem'].mean())
-            print('Altitude (mean):')
-            display(self.df_stat['Altitude'].mean())
+            self.html_02_02.value = "<table> <tr><td><span style='font-weight:bold'>Count:</spam></td> <td>{}</td></tr><tr><td><span style='font-weight:bold'>Operating:</span></td> <td>{}</td></tr> <tr> <td><span style='font-weight:bold'>Last Update:</span></td><td>{}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Drainage Area:</span></td>    <td>{:.2f}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Altitude:</span></td>    <td>{:.2f}</td>  </tr></table>".format(self.df_stat['Codigo'].count(),self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count(),self.df_stat['UltimaAtualizacao'].max(),self.df_stat['AreaDrenagem'].mean(),self.df_stat['Altitude'].mean())
 
 
 
@@ -645,19 +673,21 @@ class ANA_interactive_map:
                     self.df_stat = self.gdf.loc[(self.gdf['geometry'].within(last_polygon)) & (self.gdf['UltimaAtualizacao']>self.selectionSlider_date02.value)]
 
                 elif self.dropdown_typeView.value == 'Watershed':
+
                     for i in self.shape_02['geometry']:
                         self.df_stat = self.gdf.loc[self.gdf['geometry'].within(i)]
 
-                print('Count:')
-                display(self.df_stat['Codigo'].count())
-                print('Operating:')
-                display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
-                print('Last update:')
-                display(self.df_stat['UltimaAtualizacao'].max())
-                print('Drainage Area (mean):')
-                display(self.df_stat['AreaDrenagem'].mean())
-                print('Altitude (mean):')
-                display(self.df_stat['Altitude'].mean())
+                self.html_02_02.value = "<table> <tr><td><span style='font-weight:bold'>Count:</spam></td> <td>{}</td></tr><tr><td><span style='font-weight:bold'>Operating:</span></td> <td>{}</td></tr> <tr> <td><span style='font-weight:bold'>Last Update:</span></td><td>{}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Drainage Area:</span></td>    <td>{:.2f}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Altitude:</span></td>    <td>{:.2f}</td>  </tr></table>".format(self.df_stat['Codigo'].count(),self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count(),self.df_stat['UltimaAtualizacao'].max(),self.df_stat['AreaDrenagem'].mean(),self.df_stat['Altitude'].mean())
+                # print('Count:')
+                # display(self.df_stat['Codigo'].count())
+                # print('Operating:')
+                # display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
+                # print('Last update:')
+                # display(self.df_stat['UltimaAtualizacao'].max())
+                # print('Drainage Area (mean):')
+                # display(self.df_stat['AreaDrenagem'].mean())
+                # print('Altitude (mean):')
+                # display(self.df_stat['Altitude'].mean())
             except:
                 pass
 
@@ -675,49 +705,43 @@ class ANA_interactive_map:
             except:
                 pass
 
-            # if self.dropdown_typeView.value == 'All':
-            #     self.df_stat = self.gdf.loc[self.gdf['geometry'].within(last_polygon)]
-            #
-            # elif self.dropdown_typeView.value == 'byDate':
-            #     self.df_stat = self.gdf.loc[(self.gdf['geometry'].within(last_polygon)) & (self.gdf['UltimaAtualizacao']>self.selectionSlider_date02.value)]
-
             if self.dropdown_typeView.value == 'Watershed':
                 for i in self.shape_02['geometry']:
                     self.df_stat = self.gdf.loc[self.gdf['geometry'].within(i)]
+            self.html_02_02.value = "<table> <tr><td><span style='font-weight:bold'>Count:</spam></td> <td>{}</td></tr><tr><td><span style='font-weight:bold'>Operating:</span></td> <td>{}</td></tr> <tr> <td><span style='font-weight:bold'>Last Update:</span></td><td>{}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Drainage Area:</span></td>    <td>{:.2f}</td>  </tr>  <tr>    <td><span style='font-weight:bold'>Mean Altitude:</span></td>    <td>{:.2f}</td>  </tr></table>".format(self.df_stat['Codigo'].count(),self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count(),self.df_stat['UltimaAtualizacao'].max(),self.df_stat['AreaDrenagem'].mean(),self.df_stat['Altitude'].mean())
 
-            print('Count:')
-            display(self.df_stat['Codigo'].count())
-            print('Operating:')
-            display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
-            print('Last update:')
-            display(self.df_stat['UltimaAtualizacao'].max())
-            print('Drainage Area (mean):')
-            display(self.df_stat['AreaDrenagem'].mean())
-            print('Altitude (mean):')
-            display(self.df_stat['Altitude'].mean())
 
         self.out03_02.clear_output()
         with self.out03_02:
             pd.set_option('display.max_rows', None)
             display(self.df_stat.groupby(by='OperadoraSigla')['Codigo'].count())
 
-    # def _selection_observe_03(self, *args):
-    #     try:
-    #         if self.dropdown_typeView.value == 'byDate':
-    #             self.out03.clear_output()
-    #
-    #             last_draw = self.draw_control.last_draw['geometry']
-    #             last_polygon = Polygon([(i[0], i[1]) for i in last_draw['coordinates'][0]])
-    #             self.df_stat = self.gdf.loc[(self.gdf['geometry'].within(last_polygon)) & (self.gdf['UltimaAtualizacao']>self.selectionSlider_date02.value)]
-    #             print('Count:')
-    #             display(self.df_stat['Codigo'].count())
-    #             print('Operating:')
-    #             display(self.df_stat.loc[self.df_stat['Operando']==1, 'Codigo'].count())
-    #             print('Last update:')
-    #             display(self.df_stat['UltimaAtualizacao'].max())
-    #             print('Drainage Area (mean):')
-    #             display(self.df_stat['AreaDrenagem'].mean())
-    #             print('Altitude (mean):')
-    #             display(self.df_stat['Altitude'].mean())
-    #     except:
-    #         pass
+
+    def _selectionMultiple_observe_column(self, *args):
+        with self.out04:
+            self.dfs_merge_teste = self.dfs_merge_teste0.copy()
+
+            self.y_scale_hm_01 = bq.OrdinalScale()
+            self.y_axis_01 = bq.Axis(scale=self.y_scale_hm_01, orientation='vertical',tick_style={'font-size': 10})
+
+
+    def _button_datePeriod(self, *args):
+        with self.out04:
+            idx = pd.date_range(start=self.dfs_merge_teste['Date'].min(), end=self.dfs_merge_teste['Date'].max())
+            # print(len(idx),np.shape(self.dfs_merge_teste))
+            self.dfs_merge_teste.set_index('Date', inplace=True)
+            # print(self.dfs_merge_teste[self.dfs_merge_teste.index.duplicated()])
+            self.dfs_merge_teste = self.dfs_merge_teste[~self.dfs_merge_teste.index.duplicated()]
+            # print(self.dfs_merge_teste.head())
+            self.dfs_merge_teste = self.dfs_merge_teste.reindex(idx)
+
+            self.dfs_resample = self.dfs_merge_teste.resample('M').count()
+            self.dfs_resample = self.dfs_resample.rename_axis('Date').reset_index()
+
+            x = [i.strftime('%Y-%m') for i in self.dfs_resample['Date']]
+            y = self.dfs_resample[list(self.selectionMultiple_column.value)].columns.to_list()
+            color = (self.dfs_resample[list(self.selectionMultiple_column.value)].to_numpy()!=0).transpose().astype(int)
+
+            self.heat_01 = bq.HeatMap(x=x,y=y,color=color,scales={'x':self.x_scale_hm_01,'y':self.y_scale_hm_01,'color':self.c_scale_hm_01})
+            self.fig_01.marks = [self.heat_01]
+            self.y_axis_01.tick_values = []
