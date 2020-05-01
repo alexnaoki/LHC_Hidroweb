@@ -42,14 +42,14 @@ A quick graph visualization can be done by checking the date period with some da
   - Install `conda install requests`.
   
 4. **Core packages** for the **Interactive Map**.
+  - `conda install -c conda-forge jupyterlab`
   - `conda install numpy`
   - `conda install pandas`
   - `conda install -c conda-forge geopandas`
   - `conda install -c conda-forge ipywidgets`
   - `conda install -c conda-forge nodejs`
   - `conda install -c conda-forge ipyleaflet`
-  - `conda install -c conda-forge jupyterlab`
-  - `conda install -c conda-forge spyder`
+  - `conda install -c conda-forge bqplot`
   
 5. **Add** the newly created Virtual Environment to **Jupyter**
   - `pip install --user ipykernel`
@@ -58,6 +58,7 @@ A quick graph visualization can be done by checking the date period with some da
 6. **Install/Activate** the widgets for **Jupyter-lab**
   - `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
   - `jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet`
+  - `jupyter labextension install bqplot`
 
 7. **Opening Jupyter-lab**
   - `jupyter-lab`
