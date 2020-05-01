@@ -19,7 +19,7 @@ class ANA_interactive_map:
 
     def __init__(self):
 
-        self.m01 = ipyleaflet.Map(zoom=4, center=(-16, -50), layout=ipywidgets.Layout(width='60%', height='500px'))
+        self.m01 = ipyleaflet.Map(zoom=4, center=(-16, -50), scroll_wheel_zoom=True,layout=ipywidgets.Layout(width='60%', height='500px'))
 
         self.controls_on_Map()
 
