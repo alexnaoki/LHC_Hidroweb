@@ -19,7 +19,7 @@ class ANA_interactive_map:
 
     def __init__(self):
 
-        self.m01 = ipyleaflet.Map(zoom=6, center=(-16, -47), layout=ipywidgets.Layout(width='60%', height='500px'))
+        self.m01 = ipyleaflet.Map(zoom=4, center=(-16, -50), layout=ipywidgets.Layout(width='60%', height='500px'))
 
         self.controls_on_Map()
 
@@ -66,7 +66,7 @@ class ANA_interactive_map:
 
     def tab00(self):
         with self.out01:
-            self.html_00_01 = ipywidgets.HTML(value="<h2>Inventory</h2><hr><p>In order to utilize the program, you need to insert a <b>Inventory File</b> or get it from the <b>ANA's API</b>.</p>")
+            self.html_00_01 = ipywidgets.HTML(value="<h2>Inventory</h2><hr><p>In order to utilize the program, you need to insert a <b>Inventory File</b> or get it from the <b>ANA's API</b>.</p><p>After completed the upload of the Inventory, you can select which <b>Layers</b> to visualize by checking the <b>top-right widget</b> on the map.</p>")
             self.radioButton_typeInvetario = ipywidgets.RadioButtons(options=['Select Path', 'Get from API'], value=None)
             self.radioButton_typeInvetario.observe(self._radioButton_inventario, names='value')
 
@@ -130,19 +130,23 @@ class ANA_interactive_map:
         self.text_pathShapefle.disabled = True
         self.button_ViewShapefile.disabled = True
 
+        self.checkbox_downloadIndividual = ipywidgets.Checkbox(description='Individual Files', value=True)
+        self.checkbox_downloadGrouped = ipywidgets.Checkbox(description='Grouped Files')
+
         self.text_pathDownload = ipywidgets.Text(placeholder='Write your PATH to Download HERE.')
 
         self.button_download = ipywidgets.Button(description='Download', layout=ipywidgets.Layout(width='30%'))
         self.button_download.on_click(self._download_button01)
 
         self.floatProgress_loadingDownload = ipywidgets.FloatProgress(min=0, max=1, value=0, layout=ipywidgets.Layout(width='90%'))
-        self.radioButton_typeDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'], layout=ipywidgets.Layout(width='30%'))
+        self.radioButton_typeDownload = ipywidgets.RadioButtons(options=['Rain', 'Flow'], layout=ipywidgets.Layout())
 
 
         return ipywidgets.VBox([ipywidgets.VBox([self.html_03_01,
                                                  self.dropdown_typeDownload,
-                                                 self.radioButton_typeDownload,
                                                  ipywidgets.HBox([self.text_pathShapefle,self.button_ViewShapefile])]),
+                                self.radioButton_typeDownload,
+                                ipywidgets.HBox([self.checkbox_downloadIndividual, self.checkbox_downloadGrouped]),
                                 ipywidgets.HBox([self.text_pathDownload, self.button_download]),
                                 self.floatProgress_loadingDownload])
 
@@ -196,6 +200,7 @@ class ANA_interactive_map:
 
         self.accordion01 = ipywidgets.Accordion([self.out03_02])
         self.accordion01.set_title(0, 'More stats')
+        self.accordion01.selected_index = None
 
         return ipywidgets.VBox([self.html_02_01,
                                 self.dropdown_typeView,
@@ -337,8 +342,13 @@ class ANA_interactive_map:
 
             if len(list_data) > 0:
                 df = pd.DataFrame({'Date': list_month_dates, 'Consistence_{}_{}'.format(typeData,station): list_consistenciaF, 'Data{}_{}'.format(typeData,station): list_data})
-                filename = '{}_{}.csv'.format(typeData, station)
-                df.to_csv(path_folder / filename)
+
+                if self.checkbox_downloadIndividual.value == True:
+                    filename = '{}_{}.csv'.format(typeData, station)
+                    df.to_csv(path_folder / filename)
+                else:
+                    pass
+
                 count += 1
                 self.floatProgress_loadingDownload.value = float(count+1)/numberOfcodes
                 self.dfs_download.append(df)
@@ -347,11 +357,12 @@ class ANA_interactive_map:
                 self.floatProgress_loadingDownload.value = float(count+1)/numberOfcodes
 
         try:
-            # self.dfs_merge_teste = pd.merge(self.dfs_download[0], self.dfs_download[1], on=['Date'], how='outer')
             self.dfs_merge_teste0 = reduce(lambda left,right: pd.merge(left, right, on=['Date'], how='outer'), self.dfs_download)
-            # self.dropdown_xAxis_01.options = self.dfs_merge_teste.columns.to_list()
-            # self.dropdown_yAxis_01.options = self.dropdown_xAxis_01.options
-            self.dfs_merge_teste0.to_csv(path_folder/'Todos_dados_{}.csv'.format(typeData))
+
+            if self.checkbox_downloadGrouped.value == True:
+                self.dfs_merge_teste0.to_csv(path_folder/'GroupedData_{}.csv'.format(typeData))
+            else:
+                pass
             self.selectionMultiple_column.options = list(filter(lambda i: 'Data' in i, self.dfs_merge_teste0.columns.to_list()))
         except:
             pass
