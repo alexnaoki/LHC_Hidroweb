@@ -5,3 +5,4 @@ geopandas==0.7.0
 shapely==1.7.0
 requests==2.23.0
 numpy==1.18.1
+bqplot==0.11.2
