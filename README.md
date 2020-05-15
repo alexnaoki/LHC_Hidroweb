@@ -6,7 +6,7 @@ LHC_Hidroweb is a Jupyter application for visualize ANA's Inventory and download
 
 # Usage
 
-You can use a ".csv" file from ANA's website, or you can get the latest Inventory file from ANA's API (and later save in your local).
+You can use a ".csv" file from ANA's website, or you can get the latest Inventory file from ANA's API (and later save in your local). Don't forget to add 'Inventario.csv' at the end.
 ![](https://github.com/alexnaoki/LHC_Hidroweb/blob/master/gifs/inventario01_v2.gif)
 
 After uploading the Inventory data you can **visualize** the columns in the inventory.
