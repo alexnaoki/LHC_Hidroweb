@@ -1,4 +1,7 @@
 # LHC_Hidroweb
+
+[![DOI](https://zenodo.org/badge/245466190.svg)](https://zenodo.org/badge/latestdoi/245466190)
+
 ---------------------
 # Introduction
 
